@@ -1,10 +1,7 @@
 import General.IState;
 import General.Problem;
-import General.State;
-import Problems.nPuzzle;
-import Uninformed.Unweighted.BFS;
+import Problems.PathFinding.nPuzzle;
 import Uninformed.Unweighted.DFID;
-import Uninformed.Unweighted.DFS;
 
 import java.util.AbstractList;
 

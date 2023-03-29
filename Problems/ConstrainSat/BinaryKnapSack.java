@@ -1,4 +1,4 @@
-package Problems;
+package Problems.ConstrainSat;
 
 
 import General.IState;
@@ -12,12 +12,15 @@ import java.util.Set;
 /**
  * The problem is to maximise the value of the bag we are picking
  * subject to the weight capacity
+ * TODO: this module is not done at all, need to refactor and finish in the future, im ahead of my time writing this
+ *
  */
 public class BinaryKnapSack {
     public float[] values;
     public float[] weights;
     public float Capacity;
 
+    public BinaryKnapSackProblem problem;
     private static class BinaryKnapSackProblem extends Problem
     {
 
@@ -95,6 +98,15 @@ public class BinaryKnapSack {
         public void SetParent(IState state) {
             Parent = (BagState) state;
         }
+        public String toString()
+        {
+            Object[] sorted_arr = this.bag.stream().sorted().toArray();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < sorted_arr.length; i++) {
+                builder.append(String.format(" %d ", (Integer)sorted_arr[i]));
+            }
+            return builder.toString();
+        }
     }
     static class KnapOperator implements Operator
     {
@@ -131,6 +143,22 @@ public class BinaryKnapSack {
             // illigal any other case
             return false;
         }
+
+    }
+    private Operator[] getOperators()
+    {
+        Operator[] operators = new Operator[this.weights.length * 2];
+        for (int i = 0; i < operators.length; i++) {
+            if(i % 2 == 0)
+            {
+                operators[i] = new KnapOperator(i, true);
+            }
+            else
+            {
+                operators[i] = new KnapOperator(i, false);
+            }
+        }
+        return operators;
     }
     public BinaryKnapSack(float[] values, float[] weights, float Capacity)
     {
@@ -139,7 +167,13 @@ public class BinaryKnapSack {
         this.values = values;
         this.weights = weights;
         this.Capacity = Capacity;
+
+        // create operators
+        Operator[] operators = getOperators();
+//        this.problem = new BinaryKnapSackProblem();
+
     }
+
 
 
 }

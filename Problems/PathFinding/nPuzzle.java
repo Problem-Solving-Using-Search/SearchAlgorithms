@@ -1,4 +1,4 @@
-package Problems;
+package Problems.PathFinding;
 
 import General.IState;
 import General.Operator;

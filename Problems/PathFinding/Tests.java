@@ -1,7 +1,7 @@
-package Problems;
+package Problems.PathFinding;
 
 import General.IState;
-import org.junit.jupiter.api.DisplayName;
+import Problems.PathFinding.nPuzzle;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
