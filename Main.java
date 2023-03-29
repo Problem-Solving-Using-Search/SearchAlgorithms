@@ -1,7 +1,10 @@
 import General.IState;
+import General.Problem;
 import General.State;
 import Problems.nPuzzle;
 import Uninformed.Unweighted.BFS;
+import Uninformed.Unweighted.DFID;
+import Uninformed.Unweighted.DFS;
 
 import java.util.AbstractList;
 
@@ -16,9 +19,9 @@ public class Main {
                       };
         int[][] init_grid3 =
                       {
-                              {-1 ,8, 7},
-                              {6, 5, 4},
-                              {3, 2, 1}
+                              {6 ,2, 8},
+                              {3, 4, 1},
+                              {-1, 7, 5}
                       };
         int[][] end_grid2 =
                 {
@@ -31,10 +34,13 @@ public class Main {
                         {3,2},
                         {1, -1}
                 };
-        AbstractList<IState> path = BFS.run(new nPuzzle(2, init_grid2, end_grid2).getProblem());
+        Problem threePuzzle = new nPuzzle(3, init_grid3, end_grid3).getProblem();
+//        AbstractList<IState> path = BFS.run(threePuzzle);
+//        AbstractList<IState> path = DFS.run(threePuzzle);
+        AbstractList<IState> path = DFID.run(threePuzzle);
         for(IState state : path)
         {
-            System.out.println(state.toString());
+            System.out.println(state);
         }
     }
 }
