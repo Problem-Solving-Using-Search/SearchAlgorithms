@@ -10,7 +10,7 @@ import static General.Utils.deepCopy;
 
 public class nPuzzle
 {
-    Puzzle puzzle;
+    static Puzzle puzzle;
     enum Movements
     {
         Up,
@@ -18,7 +18,7 @@ public class nPuzzle
         Left,
         Right
     }
-    private static class Puzzle extends Problem
+    static class Puzzle extends Problem
     {
         private int N;
         public Puzzle(IState init, IState end, Operator[] operators) {
@@ -31,8 +31,9 @@ public class nPuzzle
         }
 
     }
-    private static class GridState implements IState
+    static class GridState implements IState
     {
+        private Movements lastOperation;
         private GridState Parent;
         private int[][] grid;
         public GridState(int[][] grid, IState parent)
@@ -44,6 +45,18 @@ public class nPuzzle
         {
             this.grid = grid;
             this.Parent = this;
+        }
+        public Movements getLastOperation()
+        {
+            return lastOperation;
+        }
+        public void setLastOperation(Movements movement)
+        {
+            this.lastOperation = movement;
+        }
+        public GridState getParent()
+        {
+            return this.Parent;
         }
         @Override
         public boolean compare(IState state2) {
@@ -62,10 +75,11 @@ public class nPuzzle
             linkedList.add(this);
             GridState gridState = this;
             // check if parent not equals son
-            while(gridState.compare(gridState.Parent))
+            while(!gridState.compare(gridState.Parent))
             {
-                gridState = (GridState) linkedList.get(0);
-                linkedList.add(gridState.Parent);
+                gridState = (GridState) linkedList.getLast();
+                if(!gridState.Parent.compare(gridState))
+                    linkedList.add(gridState.Parent);
             }
             return linkedList;
         }
@@ -88,7 +102,7 @@ public class nPuzzle
         }
     }
 
-    private class GridOperator implements Operator
+    static class GridOperator implements Operator
     {
         Movements movement;
         private int[] find_gap(int[][] grid)
@@ -129,19 +143,22 @@ public class nPuzzle
                 grid[row_ind][col_ind] = grid[row_ind][col_ind + i];
                 grid[row_ind][col_ind + i] = -1;
             }
-            return new GridState(grid, s);
+            GridState state = new GridState(grid, s);
+            state.setLastOperation(this.movement);
+            return state;
         }
 
         @Override
         public boolean CheckPossible(IState s) {
-            int[][] grid = ((GridState) s).grid;
+            GridState state = ((GridState) s);
+            int[][] grid = state.grid;
             int[] gap_indices = find_gap(grid);
             assert gap_indices != null;
             return switch (movement) {
-                case Up -> !(gap_indices[0] - 1 < 0);
-                case Down -> !(gap_indices[0] + 1 >= puzzle.N);
-                case Left -> !(gap_indices[1] - 1 < 0);
-                default -> !(gap_indices[1] + 1 >= puzzle.N);
+                case Up -> !(gap_indices[0] - 1 < 0) && state.getLastOperation() != Movements.Down;
+                case Down -> !(gap_indices[0] + 1 >= puzzle.N) && state.getLastOperation() != Movements.Up;
+                case Left -> !(gap_indices[1] - 1 < 0) && state.getLastOperation() != Movements.Right;
+                default -> !(gap_indices[1] + 1 >= puzzle.N) && state.getLastOperation() != Movements.Left;
             };
         }
     }

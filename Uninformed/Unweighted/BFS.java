@@ -27,7 +27,6 @@ public class BFS {
             else
             // If we didn't find the goal, expand the current node
             {
-
                 for(Operator op: problem.getOperators())
                 {
                     // check possibility of deriving this state
