@@ -35,9 +35,15 @@ public class nPuzzle
     {
         private GridState Parent;
         private int[][] grid;
+        public GridState(int[][] grid, IState parent)
+        {
+            this.grid = grid;
+            this.Parent = (GridState) parent;
+        }
         public GridState(int[][] grid)
         {
             this.grid = grid;
+            this.Parent = this;
         }
         @Override
         public boolean compare(IState state2) {
@@ -123,7 +129,7 @@ public class nPuzzle
                 grid[row_ind][col_ind] = grid[row_ind][col_ind + i];
                 grid[row_ind][col_ind + i] = -1;
             }
-            return new GridState(grid);
+            return new GridState(grid, s);
         }
 
         @Override

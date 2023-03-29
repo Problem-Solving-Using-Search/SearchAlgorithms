@@ -4,13 +4,15 @@ import General.Problem;
 import General.IState;
 
 import java.util.AbstractList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 public class BFS {
 
     public static AbstractList<IState> run(Problem problem)
     {
-        Stack<IState> path = new Stack<>();
+        LinkedList<IState> path = new LinkedList<>();
         
         path.add(problem.getInit());
         IState end = problem.getEnd();
@@ -28,8 +30,18 @@ public class BFS {
 
                 for(Operator op: problem.getOperators())
                 {
+                    // check possibility of deriving this state
                     if(op.CheckPossible(cur_state))
-                        path.add(op.operate(cur_state));
+                    {
+                        IState resulted_state = op.operate(cur_state);
+                        if(resulted_state.compare(end))
+                        // if we found the goal
+                        {
+                            return resulted_state.GetPath();
+                        }
+                        path.add(resulted_state);
+                    }
+
                 }
             }
         }
