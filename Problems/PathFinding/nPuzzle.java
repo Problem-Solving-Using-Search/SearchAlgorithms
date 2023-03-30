@@ -59,7 +59,7 @@ public class nPuzzle
             return this.Parent;
         }
         @Override
-        public boolean compare(IState state2) {
+        public boolean equals(IState state2) {
             for (int i = 0; i < grid.length; i++) {
                 for (int j = 0; j < grid[0].length; j++) {
                     if(grid[i][j] != ((GridState)state2).grid[i][j])
@@ -75,10 +75,10 @@ public class nPuzzle
             linkedList.add(this);
             GridState gridState = this;
             // check if parent not equals son
-            while(!gridState.compare(gridState.Parent))
+            while(!gridState.equals(gridState.Parent))
             {
                 gridState = (GridState) linkedList.getLast();
-                if(!gridState.Parent.compare(gridState))
+                if(!gridState.Parent.equals(gridState))
                     linkedList.add(gridState.Parent);
             }
             return linkedList;

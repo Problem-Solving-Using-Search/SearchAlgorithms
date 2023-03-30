@@ -7,7 +7,7 @@ import java.util.LinkedList;
  */
 public interface IState {
 
-    public boolean compare(IState state2);
+    public boolean equals(IState state2);
     public LinkedList<IState> GetPath();
     public void SetParent(IState state);
     public String toString();

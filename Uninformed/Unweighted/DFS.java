@@ -21,7 +21,7 @@ public class DFS {
         while(!path.isEmpty())
         {
             IState cur_state = path.pop();
-            if(cur_state.compare(end))
+            if(cur_state.equals(end))
             // if we found the goal
             {
                 return cur_state.GetPath();
@@ -33,7 +33,7 @@ public class DFS {
                 if(op.CheckPossible(cur_state))
                 {
                     IState resulted_state = op.operate(cur_state);
-                    if(resulted_state.compare(end))
+                    if(resulted_state.equals(end))
                     // if we found the goal
                     {
                         return resulted_state.GetPath();

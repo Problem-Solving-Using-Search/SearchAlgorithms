@@ -4,10 +4,8 @@ import General.IState;
 import General.Operator;
 import General.Problem;
 
-import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Stack;
 
 public class DFID {
     public static LinkedList<IState> run(Problem problem)
@@ -36,7 +34,7 @@ public class DFID {
     private static LinkedList<IState> LimitedDFSLA(Problem problem, int limit, IState cur_node, HashMap<String, Boolean> hash)
     {
         boolean cutoff = false;
-        if(cur_node.compare(problem.getEnd()))
+        if(cur_node.equals(problem.getEnd()))
         {
             // if we reached the goal
             return cur_node.GetPath();
@@ -77,7 +75,7 @@ public class DFID {
     }
     private static LinkedList<IState> LimitedDFS(Problem problem, int limit, IState cur_node)
     {
-        if(cur_node.compare(problem.getEnd()))
+        if(cur_node.equals(problem.getEnd()))
         {
             // if we reached the goal
             return cur_node.GetPath();

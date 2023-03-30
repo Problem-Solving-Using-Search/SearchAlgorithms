@@ -78,7 +78,7 @@ public class BinaryKnapSack {
             return sum;
         }
         @Override
-        public boolean compare(IState state2) {
+        public boolean equals(IState state2) {
             return ((BagState)state2).bag.equals(bag);
         }
         @Override
@@ -86,7 +86,7 @@ public class BinaryKnapSack {
             LinkedList<IState> path = new LinkedList<>();
             BagState cur = this;
             path.add(this);
-            while(!cur.Parent.compare(cur))
+            while(!cur.Parent.equals(cur))
             {
                 cur = cur.Parent;
                 path.add(Parent);

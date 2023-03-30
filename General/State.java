@@ -21,7 +21,7 @@ public class State implements IState{
     }
 
     @Override
-    public boolean compare(IState state2) {
+    public boolean equals(IState state2) {
         return this.Value.equals(((State)state2).getValue());
     }
 
