@@ -35,6 +35,11 @@ public class State implements IState{
         this.Parent = (State)state;
     }
 
+    @Override
+    public IState GetParent()
+    {
+        return this.Parent;
+    }
 
 
 }

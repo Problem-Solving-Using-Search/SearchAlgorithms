@@ -90,6 +90,11 @@ public class nPuzzle
         }
 
         @Override
+        public IState GetParent() {
+            return null;
+        }
+
+        @Override
         public String toString() {
             StringBuilder builder = new StringBuilder("");
             for (int i = 0; i < grid.length; i++) {

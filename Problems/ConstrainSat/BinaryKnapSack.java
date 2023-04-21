@@ -98,6 +98,12 @@ public class BinaryKnapSack {
         public void SetParent(IState state) {
             Parent = (BagState) state;
         }
+
+        @Override
+        public IState GetParent() {
+            return null;
+        }
+
         public String toString()
         {
             Object[] sorted_arr = this.bag.stream().sorted().toArray();

@@ -76,6 +76,11 @@ public class RubiksCube {
         public void SetParent(IState state) {
             this.parent = (CubeState) state;
         }
+
+        @Override
+        public IState GetParent() {
+            return null;
+        }
     }
 
     static class CubeOperator implements Operator
@@ -106,9 +111,11 @@ public class RubiksCube {
             }
             byte[][][] fourCubeSides = new byte[4][3][3];
             byte[][][] fourCubeSides_temp = new byte[4][3][3];
+            byte[] cubeSidesIndices = new byte[4];
             int j = 0;
             for (int i = 0; i < cube_new.length; i++) {
                 if(i != side.ordinal() && i != oposite.ordinal())
+                    // if(j-1 >= 0 && (fourCubeSides[j-1]))
                     fourCubeSides[j++] = cube[i];
             }
             // for each side that is consequent to the side before, rotate it
