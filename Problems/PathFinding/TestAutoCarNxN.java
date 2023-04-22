@@ -2,6 +2,8 @@ package Problems.PathFinding;
 
 import General.IState;
 import General.Utils;
+import Uninformed.Unweighted.BFS;
+import Uninformed.Unweighted.DFID;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -81,6 +83,48 @@ public class TestAutoCarNxN {
     @Test
     public void testStateAutoCarNxN()
     {
+        /* Testing GetPath*/
+        TestCase case0 = cases.get(0);
+        try{
+            AutoCarNxN test0 = new AutoCarNxN(case0.surface,case0.init_indices,case0.end_indices);
+            AutoCarNxNOperator right = test0.CreateOperator(Movements.R);
+            AutoCarNxNOperator down = test0.CreateOperator(Movements.D);
+
+            AutoCarNxNState state = (AutoCarNxNState) test0.problem.getInit();
+            AutoCarNxNState stateActual1 = (AutoCarNxNState) down.operate(state);
+            int[] new_indices1 = case0.init_indices;
+
+            new_indices1[0] +=1;
+            AutoCarNxNState state1 = new AutoCarNxNState(new_indices1,test0.surface,1);
+            assertTrue(state1.equals(stateActual1));
+
+            AutoCarNxNState stateActual2 = (AutoCarNxNState) down.operate(stateActual1);
+            new_indices1[0] +=1;
+            AutoCarNxNState state2 = new AutoCarNxNState(new_indices1,test0.surface,2);
+            assertTrue(stateActual2.equals(state2));
+
+            AutoCarNxNState stateActual3 = (AutoCarNxNState) right.operate(stateActual2);
+            new_indices1[1] +=1 ;
+            AutoCarNxNState state3 = new AutoCarNxNState(new_indices1, test0.surface, 7);
+            assertTrue(stateActual3.equals(state3));
+
+            LinkedList<IState> expectedPath = new LinkedList<>();
+            expectedPath.add(stateActual3);
+            expectedPath.add(stateActual2);
+            expectedPath.add(stateActual1);
+            expectedPath.add(state);
+            LinkedList<IState> path = stateActual3.GetPath();
+            for(int i=0; i<path.size(); i++)
+            {
+                assertTrue(path.get(i).equals(expectedPath.get(i)));
+            }
+
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+
 
     }
     @Test
@@ -107,7 +151,12 @@ public class TestAutoCarNxN {
                                 Arrays.asList(
                                     test0.CreateOperator(Movements.U),
                                     test0.CreateOperator(Movements.L),
-                                    test0.CreateOperator(Movements.LU))
+                                    test0.CreateOperator(Movements.LU),
+                                    test0.CreateOperator(Movements.D),
+                                    test0.CreateOperator(Movements.R),
+                                    test0.CreateOperator(Movements.LD),
+                                    test0.CreateOperator(Movements.RU),
+                                    test0.CreateOperator(Movements.RD))
                             )
                             )
                     );
@@ -116,9 +165,25 @@ public class TestAutoCarNxN {
                         test0.GetValidOperators(test_states[i]);
                 HashSet<AutoCarNxNOperator> expectedSet = expected_results.get(i);
                 HashSet<AutoCarNxNOperator> actualSet = new HashSet<>(actual);
-                // not working please fix me, im tired
-                assertTrue(expectedSet.containsAll(actualSet) && actualSet.containsAll(expectedSet),
-                expectedSet + ", " + actualSet);
+
+                // i don't want to mess with hashcodes, so naive implementation as follows
+                for(boolean isExpected : new boolean[]{true, false})
+                {
+                    HashSet<AutoCarNxNOperator> firstSet = isExpected ? expectedSet : actualSet;
+                    HashSet<AutoCarNxNOperator> secondSet = isExpected ? actualSet : expectedSet;
+                    for (AutoCarNxNOperator operator :
+                            firstSet) {
+                        boolean isIn = false;
+                        for (AutoCarNxNOperator operator2 :
+                                secondSet) {
+                            if (operator.equals(operator2)) {
+                                isIn = true;
+                            }
+                        }
+                        if (!isIn)
+                            fail("Cannot find operator in actual set, " + actualSet + expectedSet + " iteration: " + i);
+                    }
+                }
             }
 
         }
@@ -127,5 +192,83 @@ public class TestAutoCarNxN {
             fail(e.getMessage());
         }
 
+    }
+
+    /**
+     * Generates a path from S using operators[i] each activates times[i] times, where i=0 is starting point
+     * @param operators Operators to use at a certain point
+     * @param times number of times to activate the operator[i]
+     * @return
+     */
+    private AbstractList<IState> generateExpectedPath(AutoCarNxNOperator[] operators, int[] times,
+                                                      TestCase c)
+    {
+        try{
+            AutoCarNxN auto0 = new AutoCarNxN(c.surface,c.init_indices,c.end_indices);
+            AutoCarNxNState state = (AutoCarNxNState) auto0.problem.getInit();
+            if(operators.length != times.length)
+                throw new Exception("Cannot generate expected path, operators and times have two different lengths");
+            AbstractList<IState> expectedPath = new ArrayList<>();
+            expectedPath.add(state);
+            int n =operators.length;
+            for (int i = 0; i < n; i++) {
+                for(int j=0; j < times[i]; j++)
+                {
+                    state = (AutoCarNxNState) operators[i].operate(state);
+                    expectedPath.add(state);
+                }
+            }
+            return expectedPath;
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+            return null;
+        }
+
+    }
+    @Test
+    public void testBFS()
+    {
+        TestCase case0 = cases.get(0);
+        try{
+            AutoCarNxN auto0 = new AutoCarNxN(case0.surface,case0.init_indices,case0.end_indices);
+            BFS algo = new BFS();
+            AbstractList<IState> path = algo.run(auto0.problem, true);
+            AutoCarNxNOperator down = auto0.CreateOperator(Movements.D);
+            AutoCarNxNOperator rightDown = auto0.CreateOperator(Movements.RD);
+            AbstractList<IState> pathExpected = generateExpectedPath(
+                    new AutoCarNxNOperator[]{down, rightDown},
+                    new int[]{1,4},
+                    case0
+            );
+            assert pathExpected != null;
+            Collections.reverse(pathExpected);
+            assert path != null;
+            assertEquals(path.size(), pathExpected.size());
+            for (int i = 0; i < pathExpected.size(); i++) {
+                assertTrue(path.get(i).equals(pathExpected.get(i)));
+            }
+
+        }
+        catch(Exception e)
+        {
+            fail(e.getMessage());
+        }
+    }
+    @Test
+    public void testDFID()
+    {
+        TestCase case0 = cases.get(0);
+        try{
+            AutoCarNxN auto0 = new AutoCarNxN(case0.surface,case0.init_indices,case0.end_indices);
+            DFID algo = new DFID();
+            AbstractList<IState> path = algo.run(auto0.problem,false);
+            // TODO: implement me, seems to work but needs to be understood
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
     }
 }

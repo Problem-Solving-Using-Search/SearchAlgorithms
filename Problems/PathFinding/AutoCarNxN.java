@@ -6,6 +6,8 @@ import General.Problem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class AutoCarNxN {
     public Problem problem;
@@ -13,12 +15,12 @@ public class AutoCarNxN {
     enum Movements {
         R,
         RD,
-        RU,
         D,
         LD,
         L,
         LU,
-        U
+        U,
+        RU
     }
     enum RoadType {
         D, // dirt track , כביש עפר
@@ -90,24 +92,14 @@ public class AutoCarNxN {
         }
         private int GetCostEvaluation(AutoCarNxNState state)
         {
-            int cost = 0;
-            // cost evaluation
-            switch(state.road_type)
-            {
-                case D:
-                    cost = state.cost + 1;
-                    break;
-                case R:
-                    cost = state.cost + 3;
-                    break;
-                case H:
-                case G:
-                    cost = state.cost + 5;
-                    break;
-                case S:
-                    cost = state.cost;
-                    break;
-            }
+            int cost = switch (state.road_type) {
+                case D -> state.cost + 1;
+                case R -> state.cost + 3;
+                case H, G -> state.cost + 5;
+                case S -> state.cost;
+                default -> 0;
+                // cost evaluation
+            };
             return cost;
         }
         @Override
@@ -116,8 +108,10 @@ public class AutoCarNxN {
             if(!this.CheckPossible(s))
                 return null;
             int[] new_cell_indices = GetNewIndices(state);
-            int cost = GetCostEvaluation(state);
-            return new AutoCarNxNState(new_cell_indices, surface, cost);
+            AutoCarNxNState new_state = new AutoCarNxNState(new_cell_indices, surface);
+            new_state.cost = state.cost + GetCostEvaluation(new_state);
+            new_state.SetParent(s);
+            return new_state;
         }
 
         @Override
@@ -129,6 +123,12 @@ public class AutoCarNxN {
                 return false;
             try
             {
+                // check that the operator's result will not be the parent
+                AutoCarNxNState parentState = (AutoCarNxNState) s.GetParent();
+                if(parentState.equals(new AutoCarNxNState(indices, surface)))
+                {
+                    return false;
+                }
                 // don't go back to init state and don't go to צוק
                 RoadType rt = surface[indices[0]][indices[1]];
                 return rt != RoadType.S &&
@@ -183,20 +183,29 @@ public class AutoCarNxN {
             this.parent = this;
             this.cost = 0;
         }
+        AutoCarNxNState(int[] indices, RoadType[][] surface)
+        {
+            this(indices,surface,0);
+        }
         AutoCarNxNState(int[] indices, RoadType[][] surface, int cost)
         {
             this.indices = indices;
             this.road_type = surface[indices[0]][indices[1]];
             this.parent = this;
-            this.cost = 0;
+            this.cost = cost;
         }
 
         @Override
         public boolean equals(IState state2) {
-            AutoCarNxNState s2 = ((AutoCarNxNState) state2);
-            return road_type == s2.road_type
-                    && indices[0] == s2.indices[0]
-                    && indices[1] == s2.indices[1];
+            if(state2 instanceof AutoCarNxNState)
+            {
+                AutoCarNxNState s2 = ((AutoCarNxNState) state2);
+                return road_type == s2.road_type
+                        && indices[0] == s2.indices[0]
+                        && indices[1] == s2.indices[1];
+            }
+            return false;
+
         }
         @Override
         public void SetParent(IState state) {
@@ -250,10 +259,25 @@ public class AutoCarNxN {
         Movements[] movementsValues = Movements.values();
         AutoCarNxNOperator[] operators = new AutoCarNxNOperator[movementsValues.length];
         int i=0;
-        for (Movements movement : movementsValues) {
+        for (Movements movement : movementsValues) { /* putting the operators in clockwise order
+        i.e R RD D LD L LU U RU, for contrast ccw would be R RU U LU L LD D RD */
             operators[i++] = new AutoCarNxNOperator(movement);
         }
         this.problem = new AutoCarNxNProblem(init_state,end_state, operators);
+    }
+
+    /**
+     *
+     * @param operators
+     * @return
+     */
+    public static List<Operator> ReverseOrder(Operator[] operators)
+    {
+       List<Operator> ops = Arrays.asList(operators);
+       Operator first = ops.remove(0); // remove the
+       Collections.reverse(ops); // reverse order of the remaining elements
+        ops.add(0,first);
+        return ops;
     }
 
 

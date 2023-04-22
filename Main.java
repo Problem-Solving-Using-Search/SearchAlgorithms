@@ -40,7 +40,8 @@ public class Main {
         Problem threePuzzle = new nPuzzle(3, init_grid3, end_grid3).getProblem();
 //        AbstractList<IState> path = BFS.run(threePuzzle);
 //        AbstractList<IState> path = DFS.run(threePuzzle);
-        AbstractList<IState> path = DFID.run(threePuzzle);
+        DFID algo = new DFID();
+        AbstractList<IState> path = algo.run(threePuzzle,false);
         for(IState state : path)
         {
             System.out.println(state);
@@ -58,7 +59,8 @@ public class Main {
                         {{6,1,6}, {6,6,6}, {2,1,2}},
                 };
         Problem rubiksCubeProblem = new RubiksCube(init_cube).problem;
-        AbstractList<IState> path = DFID.run(rubiksCubeProblem);
+        DFID algo = new DFID();
+        AbstractList<IState> path = algo.run(rubiksCubeProblem, false);
         for(IState state : path)
         {
             System.out.println(state);

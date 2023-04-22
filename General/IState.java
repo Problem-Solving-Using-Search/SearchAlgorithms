@@ -22,11 +22,10 @@ public interface IState {
         // check if parent not equals son
         while(!state.equals(state.GetParent()))
         {
-            linkedList.add(this);
+            linkedList.add(state);
             state = state.GetParent();
         }
-        if(linkedList.size() == 0) // if a path contains one node
-            linkedList.add(state);
+        linkedList.add(state); // add the first one
         return linkedList;
     }
      void SetParent(IState state);

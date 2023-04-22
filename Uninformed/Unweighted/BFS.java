@@ -1,14 +1,20 @@
 package Uninformed.Unweighted;
+import General.ISearchAlgo;
 import General.Operator;
 import General.Problem;
 import General.IState;
+import Problems.PathFinding.AutoCarNxN;
 
-import java.util.AbstractList;
-import java.util.LinkedList;
+import java.util.*;
 
-public class BFS {
-
-    public static AbstractList<IState> run(Problem problem)
+public class BFS implements ISearchAlgo {
+    /**
+     * assumes that problem gives the operations in clockwise order
+     * @param problem
+     * @param clockwise if to generate the nodes clockwise for true or counter-clockwise otherwise
+     * @return
+     */
+    public AbstractList<IState> run(Problem problem, boolean clockwise)
     {
         LinkedList<IState> path = new LinkedList<>();
         
@@ -25,7 +31,10 @@ public class BFS {
             else
             // If we didn't find the goal, expand the current node
             {
-                for(Operator op: problem.getOperators())
+                List<Operator> operators = Arrays.asList(problem.getOperators());
+                if(!clockwise) // if we want counter clockwise then reverse the operators's places
+                    operators = AutoCarNxN.ReverseOrder(problem.getOperators());
+                for(Operator op: operators)
                 {
                     // check possibility of deriving this state
                     if(op.CheckPossible(cur_state))
@@ -45,6 +54,4 @@ public class BFS {
         // if we haven't found any goal in the graph
         return null;
     }
-
-
 }

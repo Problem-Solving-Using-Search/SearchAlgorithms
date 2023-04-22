@@ -1,20 +1,24 @@
 package Uninformed.Unweighted;
 
+import General.ISearchAlgo;
 import General.IState;
 import General.Operator;
 import General.Problem;
+import Problems.PathFinding.AutoCarNxN;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
-public class DFID {
-    public static LinkedList<IState> run(Problem problem)
+public class DFID implements ISearchAlgo {
+    public LinkedList<IState> run(Problem problem, boolean clockwise)
     {
         for(int i=1; i< 1000; i++)
         {
             HashMap<String,Boolean> hash = new HashMap<>();
             hash.put(problem.getInit().toString(),true);
-            LinkedList<IState> path = LimitedDFSLA(problem, i, problem.getInit(), hash);
+            LinkedList<IState> path = LimitedDFSLA(problem, i, problem.getInit(), hash, clockwise);
             if(path == null || !path.isEmpty())
             {
                 return path;
@@ -31,7 +35,9 @@ public class DFID {
      * @param hash
      * @return
      */
-    private static LinkedList<IState> LimitedDFSLA(Problem problem, int limit, IState cur_node, HashMap<String, Boolean> hash)
+    private static LinkedList<IState> LimitedDFSLA(Problem problem, int limit,
+                                                   IState cur_node, HashMap<String, Boolean> hash,
+                                                   boolean clockwise)
     {
         boolean cutoff = false;
         if(cur_node.equals(problem.getEnd()))
@@ -45,8 +51,13 @@ public class DFID {
             return new LinkedList<>();
         }
         hash.put(cur_node.toString(), true);
+        List<Operator> operators;
+        if(!clockwise)
+            operators = AutoCarNxN.ReverseOrder(problem.getOperators());
+        else
+            operators = Arrays.asList(problem.getOperators());
         // else
-        for(Operator op : problem.getOperators())
+        for(Operator op : operators)
         {
             if(op.CheckPossible(cur_node))
             {
@@ -55,7 +66,7 @@ public class DFID {
                 {
                     continue;
                 }
-                LinkedList<IState> ret = LimitedDFSLA(problem,limit-1, gen_state , hash);
+                LinkedList<IState> ret = LimitedDFSLA(problem,limit-1, gen_state , hash,clockwise);
                 if(ret != null && !ret.isEmpty())
                 {
                     return ret;

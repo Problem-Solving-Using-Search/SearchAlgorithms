@@ -1,19 +1,21 @@
 package Uninformed.Unweighted;
 
+import General.ISearchAlgo;
 import General.IState;
 import General.Operator;
 import General.Problem;
 
+import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.Stack;
 
-public class DFS {
+public class DFS implements ISearchAlgo {
     /**
      * Note, there is no loop avoidance in this function, meaning that this might run forever
      * @param problem
      * @return
      */
-    public static LinkedList<IState> run(Problem problem)
+    public AbstractList<IState> run(Problem problem, boolean clockwise)
     {
         Stack<IState> path = new Stack<>();
         path.add(problem.getInit());
