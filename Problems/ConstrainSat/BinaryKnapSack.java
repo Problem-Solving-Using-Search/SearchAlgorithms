@@ -95,6 +95,16 @@ public class BinaryKnapSack {
         }
 
         @Override
+        public double getCost() {
+            return 0;
+        }
+
+        @Override
+        public void setCost(double cost) {
+
+        }
+
+        @Override
         public void SetParent(IState state) {
             Parent = (BagState) state;
         }

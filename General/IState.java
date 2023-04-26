@@ -28,9 +28,12 @@ public interface IState {
         linkedList.add(state); // add the first one
         return linkedList;
     }
+    double getCost();
+    void setCost(double cost);
      void SetParent(IState state);
      IState GetParent();
      String toString();
+
 
 }
 

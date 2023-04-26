@@ -1,5 +1,5 @@
 package Uninformed.Unweighted;
-import General.ISearchAlgo;
+import General.AbstractSearchAlgo;
 import General.Operator;
 import General.Problem;
 import General.IState;
@@ -7,7 +7,11 @@ import Problems.PathFinding.AutoCarNxN;
 
 import java.util.*;
 
-public class BFS implements ISearchAlgo {
+public class BFS extends AbstractSearchAlgo {
+
+    Hashtable<String, IState> closed_list;
+    Hashtable<String, IState> open_list;
+
     /**
      * assumes that problem gives the operations in clockwise order
      * @param problem
@@ -17,7 +21,9 @@ public class BFS implements ISearchAlgo {
     public AbstractList<IState> run(Problem problem, boolean clockwise)
     {
         LinkedList<IState> path = new LinkedList<>();
-        
+        closed_list = new Hashtable<>();
+        open_list = new Hashtable<>();
+
         path.add(problem.getInit());
         IState end = problem.getEnd();
         while(!path.isEmpty())
@@ -31,8 +37,10 @@ public class BFS implements ISearchAlgo {
             else
             // If we didn't find the goal, expand the current node
             {
-                List<Operator> operators = Arrays.asList(problem.getOperators());
-                if(!clockwise) // if we want counter clockwise then reverse the operators's places
+                List<Operator> operators;
+                if(clockwise)
+                    operators = Arrays.asList(problem.getOperators());
+                else // if we want counter clockwise then reverse the operators's places
                     operators = AutoCarNxN.ReverseOrder(problem.getOperators());
                 for(Operator op: operators)
                 {
@@ -54,4 +62,5 @@ public class BFS implements ISearchAlgo {
         // if we haven't found any goal in the graph
         return null;
     }
+
 }

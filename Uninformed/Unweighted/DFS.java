@@ -1,15 +1,14 @@
 package Uninformed.Unweighted;
 
-import General.ISearchAlgo;
+import General.AbstractSearchAlgo;
 import General.IState;
 import General.Operator;
 import General.Problem;
 
 import java.util.AbstractList;
-import java.util.LinkedList;
 import java.util.Stack;
 
-public class DFS implements ISearchAlgo {
+public class DFS extends AbstractSearchAlgo {
     /**
      * Note, there is no loop avoidance in this function, meaning that this might run forever
      * @param problem

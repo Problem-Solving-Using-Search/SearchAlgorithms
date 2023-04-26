@@ -53,7 +53,10 @@ public class AutoCarNxN {
     {
         return new AutoCarNxNOperator(movement);
     }
-
+    public double CalcManhetenDistance(AutoCarNxNState state1, AutoCarNxNState state2)
+    {
+        return (state2.indices[0] - state1.indices[0]) ^ 2 + (state2.indices[1] - state1.indices[1])^2;
+    }
     class AutoCarNxNOperator implements Operator
     {
         Movements movement;
@@ -90,9 +93,9 @@ public class AutoCarNxN {
             }
             return new_cell_indices;
         }
-        private int GetCostEvaluation(AutoCarNxNState state)
+        private double GetCostEvaluation(AutoCarNxNState state)
         {
-            int cost = switch (state.road_type) {
+            return switch (state.road_type) {
                 case D -> state.cost + 1;
                 case R -> state.cost + 3;
                 case H, G -> state.cost + 5;
@@ -100,17 +103,19 @@ public class AutoCarNxN {
                 default -> 0;
                 // cost evaluation
             };
-            return cost;
         }
+
         @Override
         public IState operate(IState s) {
+
             AutoCarNxNState state = (AutoCarNxNState) s;
-            if(!this.CheckPossible(s))
+            if(!this.CheckPossible(s)) // this is not generated node if it's not possible
                 return null;
             int[] new_cell_indices = GetNewIndices(state);
             AutoCarNxNState new_state = new AutoCarNxNState(new_cell_indices, surface);
             new_state.cost = state.cost + GetCostEvaluation(new_state);
             new_state.SetParent(s);
+            General.Support.increaseNodesGenerated(1); // only if we generated a node
             return new_state;
         }
 
@@ -161,7 +166,7 @@ public class AutoCarNxN {
         RoadType road_type;
         /** 2 indices, first is row, and second is col of this state*/
         int[] indices;
-        int cost;
+        double cost;
         /** Use me to init the cost as preferred*/
         AutoCarNxNState(int[] indices, RoadType road_type, AutoCarNxNState parent, int cost)
         {
@@ -200,13 +205,23 @@ public class AutoCarNxN {
             if(state2 instanceof AutoCarNxNState)
             {
                 AutoCarNxNState s2 = ((AutoCarNxNState) state2);
-                return road_type == s2.road_type
-                        && indices[0] == s2.indices[0]
+                return indices[0] == s2.indices[0]
                         && indices[1] == s2.indices[1];
             }
             return false;
 
         }
+
+        @Override
+        public double getCost() {
+            return cost;
+        }
+
+        @Override
+        public void setCost(double cost) {
+            this.cost = cost;
+        }
+
         @Override
         public void SetParent(IState state) {
             this.parent = (AutoCarNxNState) state;
@@ -215,6 +230,12 @@ public class AutoCarNxN {
         @Override
         public IState GetParent() {
             return this.parent;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.indices[0] + "," + this.indices[1];
         }
     }
     private static RoadType[][] convertCharArrToRT(char[][] char_surface)

@@ -1,11 +1,18 @@
 package Problems.PathFinding;
 
+import General.IHeuristic;
 import General.IState;
 import General.Utils;
 import Uninformed.Unweighted.BFS;
 import Uninformed.Unweighted.DFID;
+import Uninformed.weighted.AStar;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 import Problems.PathFinding.AutoCarNxN.*;
@@ -27,6 +34,17 @@ public class TestAutoCarNxN {
         }
     }
     ArrayList<TestCase> cases;
+    int currentCase;
+    public static PrintWriter printer;
+
+    static {
+        try {
+            printer = new PrintWriter(new FileWriter("Inputs/Input"), true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public TestAutoCarNxN() throws Exception {
         cases = new ArrayList<>();
         cases.add(new TestCase(
@@ -44,6 +62,26 @@ public class TestAutoCarNxN {
                 new int[]{1,1}, // sub 1
                 new int[]{6,5}) // sub 1
         );
+        cases.add(new TestCase(
+                """
+                        XXXXXXXXXX
+                        XSRRRRXXXX
+                        XDXXXXXXXX
+                        HDHHHHHHHH
+                        HDHHHHHHHH
+                        HGRRHHHHHH
+                        XXHHHHHHHH
+                        XXHHHHHHHH
+                        XHHHHHHHHH
+                        XXHHHHHHHH""",new int[]{1,1},
+                                        new int[]{5,1}
+        ));
+        this.currentCase = 1;
+        for (char[] c : cases.get(currentCase).surface) {
+            StringBuilder line = new StringBuilder("");
+            line.append(c);
+            printer.println(line);
+        }
 
     }
     /**
@@ -203,72 +241,85 @@ public class TestAutoCarNxN {
     private AbstractList<IState> generateExpectedPath(AutoCarNxNOperator[] operators, int[] times,
                                                       TestCase c)
     {
-        try{
-            AutoCarNxN auto0 = new AutoCarNxN(c.surface,c.init_indices,c.end_indices);
-            AutoCarNxNState state = (AutoCarNxNState) auto0.problem.getInit();
-            if(operators.length != times.length)
-                throw new Exception("Cannot generate expected path, operators and times have two different lengths");
-            AbstractList<IState> expectedPath = new ArrayList<>();
-            expectedPath.add(state);
-            int n =operators.length;
-            for (int i = 0; i < n; i++) {
-                for(int j=0; j < times[i]; j++)
-                {
-                    state = (AutoCarNxNState) operators[i].operate(state);
-                    expectedPath.add(state);
-                }
+
+        AutoCarNxN auto0 = getProblemInstance(c);
+        if(auto0 == null)
+            return null;
+        AutoCarNxNState state = (AutoCarNxNState) auto0.problem.getInit();
+        if(operators.length != times.length)
+        {
+            fail("Cannot generate expected path, operators and times have two different lengths");
+            return null;
+        }
+        AbstractList<IState> expectedPath = new ArrayList<>();
+        expectedPath.add(state);
+        int n =operators.length;
+        for (int i = 0; i < n; i++) {
+            for(int j=0; j < times[i]; j++)
+            {
+                state = (AutoCarNxNState) operators[i].operate(state);
+                expectedPath.add(state);
             }
-            return expectedPath;
+        }
+        return expectedPath;
+
+    }
+    public AutoCarNxN getProblemInstance(TestCase c)
+    {
+        try
+        {
+            return new AutoCarNxN(c.surface, c.init_indices, c.end_indices);
         }
         catch (Exception e)
         {
             fail(e.getMessage());
             return null;
         }
-
     }
     @Test
-    public void testBFS()
-    {
+    public void testBFS() {
         TestCase case0 = cases.get(0);
-        try{
-            AutoCarNxN auto0 = new AutoCarNxN(case0.surface,case0.init_indices,case0.end_indices);
-            BFS algo = new BFS();
-            AbstractList<IState> path = algo.run(auto0.problem, true);
-            AutoCarNxNOperator down = auto0.CreateOperator(Movements.D);
-            AutoCarNxNOperator rightDown = auto0.CreateOperator(Movements.RD);
-            AbstractList<IState> pathExpected = generateExpectedPath(
-                    new AutoCarNxNOperator[]{down, rightDown},
-                    new int[]{1,4},
-                    case0
-            );
-            assert pathExpected != null;
-            Collections.reverse(pathExpected);
-            assert path != null;
-            assertEquals(path.size(), pathExpected.size());
-            for (int i = 0; i < pathExpected.size(); i++) {
-                assertTrue(path.get(i).equals(pathExpected.get(i)));
-            }
-
+        AutoCarNxN auto0 = getProblemInstance(case0);
+        BFS algo = new BFS();
+        General.Support.resetNumNodesGenerated();
+        AbstractList<IState> path = algo.run(auto0.problem, true);
+        AutoCarNxNOperator down = auto0.CreateOperator(Movements.D);
+        AutoCarNxNOperator rightDown = auto0.CreateOperator(Movements.RD);
+        AbstractList<IState> pathExpected = generateExpectedPath(
+                new AutoCarNxNOperator[]{down, rightDown},
+                new int[]{1,4},
+                case0
+        );
+        assert pathExpected != null;
+        Collections.reverse(pathExpected);
+        assert path != null;
+        assertEquals(path.size(), pathExpected.size());
+        for (int i = 0; i < pathExpected.size(); i++) {
+            assertTrue(path.get(i).equals(pathExpected.get(i)));
         }
-        catch(Exception e)
-        {
-            fail(e.getMessage());
-        }
+        // TODO: Requires to assert the number of nodes generated
     }
     @Test
     public void testDFID()
     {
         TestCase case0 = cases.get(0);
-        try{
-            AutoCarNxN auto0 = new AutoCarNxN(case0.surface,case0.init_indices,case0.end_indices);
-            DFID algo = new DFID();
-            AbstractList<IState> path = algo.run(auto0.problem,false);
-            // TODO: implement me, seems to work but needs to be understood
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
+        AutoCarNxN auto0 = getProblemInstance(case0);
+        DFID algo = new DFID();
+        AbstractList<IState> path = algo.run(auto0.problem,false);
+        // TODO: implement me, seems to work but needs to be understood
+    }
+    @Test
+    public void testAStar()
+    {
+        TestCase case0 = cases.get(currentCase);
+        AutoCarNxN auto0 = getProblemInstance(case0);
+        AStar algo = new AStar();
+        LinkedList<IState> list = (LinkedList<IState>) algo.run(auto0.problem, true, new IHeuristic() {
+            @Override
+            public double calcH(IState node) {
+                return auto0.CalcManhetenDistance((AutoCarNxNState) node,(AutoCarNxNState) auto0.problem.getEnd());
+            }
+        });
+        assertNotNull(null, list.toString());
     }
 }

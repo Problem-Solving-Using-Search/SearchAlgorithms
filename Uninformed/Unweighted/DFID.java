@@ -1,6 +1,6 @@
 package Uninformed.Unweighted;
 
-import General.ISearchAlgo;
+import General.AbstractSearchAlgo;
 import General.IState;
 import General.Operator;
 import General.Problem;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DFID implements ISearchAlgo {
+public class DFID extends AbstractSearchAlgo {
     public LinkedList<IState> run(Problem problem, boolean clockwise)
     {
         for(int i=1; i< 1000; i++)

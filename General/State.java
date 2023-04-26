@@ -31,6 +31,16 @@ public class State implements IState{
     }
 
     @Override
+    public double getCost() {
+        return 0;
+    }
+
+    @Override
+    public void setCost(double cost) {
+
+    }
+
+    @Override
     public void SetParent(IState state) {
         this.Parent = (State)state;
     }

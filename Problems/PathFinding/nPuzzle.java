@@ -85,6 +85,16 @@ public class nPuzzle
         }
 
         @Override
+        public double getCost() {
+            return 0;
+        }
+
+        @Override
+        public void setCost(double cost) {
+
+        }
+
+        @Override
         public void SetParent(IState state) {
             this.Parent = (GridState) state;
         }
