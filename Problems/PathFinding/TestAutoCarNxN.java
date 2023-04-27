@@ -7,6 +7,7 @@ import General.Utils;
 import Uninformed.Unweighted.BFS;
 import Uninformed.Unweighted.DFID;
 import Uninformed.weighted.AStar;
+import Uninformed.weighted.DFBnB;
 import Uninformed.weighted.IDAStar;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -281,7 +282,7 @@ public class TestAutoCarNxN {
     }
     @Test
     public void testBFS() {
-        TestCase case0 = cases.get(0);
+        TestCase case0 = cases.get(currentCase);
         AutoCarNxN auto0 = getProblemInstance(case0);
         BFS algo = new BFS();
         General.Support.resetNumNodesGenerated();
@@ -305,7 +306,7 @@ public class TestAutoCarNxN {
     @Test
     public void testDFID()
     {
-        TestCase case0 = cases.get(0);
+        TestCase case0 = cases.get(currentCase);
         AutoCarNxN auto0 = getProblemInstance(case0);
         DFID algo = new DFID();
         AbstractList<IState> path = algo.run(auto0.problem,false);
@@ -328,6 +329,18 @@ public class TestAutoCarNxN {
         TestCase case0 = cases.get(currentCase);
         AutoCarNxN auto0 = getProblemInstance(case0);
         IDAStar algo = new IDAStar();
+        LinkedList<IState> list = (LinkedList<IState>) algo.run(auto0.problem,
+                true,
+                new Heuristics.ManhettenHeuristic(auto0));
+        assertNotNull(null, list.toString());
+    }
+
+    @Test
+    public void testDFBnB()
+    {
+        TestCase case0 = cases.get(currentCase);
+        AutoCarNxN auto0 = getProblemInstance(case0);
+        DFBnB algo = new DFBnB();
         LinkedList<IState> list = (LinkedList<IState>) algo.run(auto0.problem,
                 true,
                 new Heuristics.ManhettenHeuristic(auto0));

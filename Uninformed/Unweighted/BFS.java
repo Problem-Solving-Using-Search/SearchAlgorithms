@@ -5,10 +5,21 @@ import General.Problem;
 import General.IState;
 import Problems.PathFinding.AutoCarNxN;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class BFS extends AbstractSearchAlgo {
+    public static PrintWriter printer;
 
+    static {
+        try {
+            printer = new PrintWriter(new FileWriter("Outputs/output"), true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     Hashtable<String, IState> closed_list;
     Hashtable<String, IState> open_list;
 
@@ -29,9 +40,16 @@ public class BFS extends AbstractSearchAlgo {
         while(!path.isEmpty())
         {
             IState cur_state = path.pop();
+            printer.println(cur_state.toString());
             if(cur_state.equals(end))
             // if we found the goal
             {
+                printer.println(cur_state.toString());
+                printer.println("-");
+                for (IState state :
+                        cur_state.GetPath()) {
+                    printer.println(state.toString());
+                }
                 return cur_state.GetPath();
             }
             else
@@ -51,6 +69,12 @@ public class BFS extends AbstractSearchAlgo {
                         if(resulted_state.equals(end))
                         // if we found the goal
                         {
+                            printer.println(resulted_state.toString());
+                            printer.println("-");
+                            for (IState state :
+                                    resulted_state.GetPath()) {
+                                printer.println(state.toString());
+                            }
                             return resulted_state.GetPath();
                         }
                         path.add(resulted_state);
