@@ -1,11 +1,13 @@
 package Problems.PathFinding;
 
+import General.Heuristics;
 import General.IHeuristic;
 import General.IState;
 import General.Utils;
 import Uninformed.Unweighted.BFS;
 import Uninformed.Unweighted.DFID;
 import Uninformed.weighted.AStar;
+import Uninformed.weighted.IDAStar;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -82,6 +84,7 @@ public class TestAutoCarNxN {
             line.append(c);
             printer.println(line);
         }
+
 
     }
     /**
@@ -314,12 +317,21 @@ public class TestAutoCarNxN {
         TestCase case0 = cases.get(currentCase);
         AutoCarNxN auto0 = getProblemInstance(case0);
         AStar algo = new AStar();
-        LinkedList<IState> list = (LinkedList<IState>) algo.run(auto0.problem, true, new IHeuristic() {
-            @Override
-            public double calcH(IState node) {
-                return auto0.CalcManhetenDistance((AutoCarNxNState) node,(AutoCarNxNState) auto0.problem.getEnd());
-            }
-        });
+        LinkedList<IState> list = (LinkedList<IState>) algo.run(auto0.problem,
+                true,
+                new Heuristics.ManhettenHeuristic(auto0));
         assertNotNull(null, list.toString());
     }
+    @Test
+    public void testIDAStar()
+    {
+        TestCase case0 = cases.get(currentCase);
+        AutoCarNxN auto0 = getProblemInstance(case0);
+        IDAStar algo = new IDAStar();
+        LinkedList<IState> list = (LinkedList<IState>) algo.run(auto0.problem,
+                true,
+                new Heuristics.ManhettenHeuristic(auto0));
+        assertNotNull(null, list.toString());
+    }
+
 }

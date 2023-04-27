@@ -1,5 +1,10 @@
 package General;
 
+import Problems.PathFinding.AutoCarNxN;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Problem {
 
     private IState init;
@@ -24,6 +29,16 @@ public class Problem {
     public Operator[] getOperators()
     {
         return operators;
+    }
+    public ArrayList<Operator> getPossibleOperators(IState state, boolean clockwise)
+    {
+        ArrayList<Operator> arr;
+        if(clockwise)
+            arr = new ArrayList<>(Arrays.asList(getOperators()));
+        else
+            arr = new ArrayList<>(AutoCarNxN.ReverseOrder(getOperators()));
+        arr.removeIf(operator -> !operator.CheckPossible(state));
+        return arr;
     }
 
 }

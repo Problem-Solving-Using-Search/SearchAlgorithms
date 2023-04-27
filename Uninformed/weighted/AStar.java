@@ -20,10 +20,12 @@ public class AStar extends AbstractSearchAlgo {
     static class IStateComparator implements Comparator<IState> {
         public IHeuristic heuristic;
         public IState goal;
-        public IStateComparator(IHeuristic heuristic, IState goal)
+        public IProblemHeuristics problem;
+        public IStateComparator(IHeuristic heuristic, IState goal, IProblemHeuristics problem)
         {
             this.heuristic = heuristic;
             this.goal = goal;
+            this.problem = problem;
         }
 
         @Override
@@ -50,7 +52,7 @@ public class AStar extends AbstractSearchAlgo {
     public AbstractList<IState> run(Problem problem, boolean clockwise, IHeuristic heuristic)
     {
         PriorityQueue<IState> frontier = new PriorityQueue<>(new IStateComparator(heuristic,
-                problem.getEnd())); // log(n) for getting lowest cost, marks the nodes that in the open list with lowest cost first
+                problem.getEnd(), (IProblemHeuristics) problem)); // log(n) for getting lowest cost, marks the nodes that in the open list with lowest cost first
         Hashtable<String, IState> open_list = new Hashtable<>(); // marks the nodes found yet opened
         Hashtable<String,IState> closed_list = new Hashtable<>(); // marks the nodes found that we visited and extracted all neighbors
         IState End = problem.getEnd(); // marks the goal node

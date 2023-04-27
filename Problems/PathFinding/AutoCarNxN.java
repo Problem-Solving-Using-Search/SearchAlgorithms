@@ -1,5 +1,6 @@
 package Problems.PathFinding;
 
+import General.IProblemHeuristics;
 import General.IState;
 import General.Operator;
 import General.Problem;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AutoCarNxN {
+public class AutoCarNxN  implements IProblemHeuristics {
     public Problem problem;
     public RoadType[][] surface;
     enum Movements {
@@ -53,8 +54,15 @@ public class AutoCarNxN {
     {
         return new AutoCarNxNOperator(movement);
     }
-    public double CalcManhetenDistance(AutoCarNxNState state1, AutoCarNxNState state2)
+
+    @Override
+    public Problem getProblem() {
+        return this.problem;
+    }
+
+    public double CalcManhettenDistance(IState s1, IState s2)
     {
+        AutoCarNxNState state1 = (AutoCarNxNState) s1, state2 = (AutoCarNxNState) s2;
         return (state2.indices[0] - state1.indices[0]) ^ 2 + (state2.indices[1] - state1.indices[1])^2;
     }
     class AutoCarNxNOperator implements Operator
